@@ -46,7 +46,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         # hashed password
         user.set_password(validated_data["password"])
         user.save()
-        raise AssertionError()
 
         Profile.objects.create(user=user)
 
