@@ -1,9 +1,12 @@
 from typing import Any, Mapping, Type
 
+from django.db import transaction
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+
+from apps.profiles.models import Profile
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -29,7 +32,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         return attrs
 
+    @transaction.atomic
     def create(self, validated_data: Mapping[str, Any]) -> Type[User]:
+        # TODO: Don't use set_password.
+        # create_user already makes password hashed using make_password
+        # Just pass validate password to create_user
         user = User.objects.create_user(
             username=validated_data["username"],
             email=validated_data["email"],
@@ -39,5 +46,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         # hashed password
         user.set_password(validated_data["password"])
         user.save()
+
+        Profile.objects.create(user=user)
 
         return user
