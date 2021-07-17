@@ -34,18 +34,15 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data: Mapping[str, Any]) -> Type[User]:
-        # TODO: Don't use set_password.
         # create_user already makes password hashed using make_password
         # Just pass validate password to create_user
         user = User.objects.create_user(
             username=validated_data["username"],
             email=validated_data["email"],
             first_name=validated_data["first_name"],
-            last_name=validated_data["last_name"]
+            last_name=validated_data["last_name"],
+            password=validated_data["password"]
         )
-        # hashed password
-        user.set_password(validated_data["password"])
-        user.save()
 
         Profile.objects.create(user=user)
 
