@@ -18,10 +18,17 @@ class ProfileRetrieveUpdateAPIView(RetrieveUpdateAPIView):
 
         return Response(serializer.data)
 
+    # PUT
     def update(self, request, username, *args, **kwargs):
+        # All fields are optional, so PUT and PATCH are same.
+        return self.partial_update(request, username, *args, **kwargs)
+
+    # PATCH
+    def partial_update(self, request, username, *args, **kwargs):
         profile = self.queryset.get(user__username=username)
         self.check_object_permissions(request, profile)
-        serializer = self.serializer_class(instance=profile, data=request.data)
+        serializer = self.serializer_class(
+            instance=profile, data=request.data, partial=True)
         serializer.is_valid()
         serializer.save()
 
