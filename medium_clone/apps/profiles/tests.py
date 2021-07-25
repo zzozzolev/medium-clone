@@ -42,8 +42,10 @@ class ProfileRetrieveUpdateTests(APITestCase):
         """
         Allow owner only to update his/her profile.
         """
-        # TODO: Authorization: Token 헤더 지정하고 test2 프로필 수정
-        res = self.client.put(reverse("profile_retrieveupdate_view"))
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.user1_token}")
+        res = self.client.patch(
+            reverse("profile_retrieveupdate_view", kwargs={"username": "test2"}))
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_modify_partial(self):
         """
