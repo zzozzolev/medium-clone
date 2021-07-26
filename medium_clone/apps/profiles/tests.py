@@ -51,3 +51,10 @@ class ProfileRetrieveUpdateTests(APITestCase):
         """
         User can modify a part of the profile.
         """
+        data = {"bio": "awesome", "username": "test1",
+                "email": "email@test.com"}
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Token {self.user1_token}")
+        res = self.client.patch(
+            reverse("profile_retrieveupdate_view", kwargs={"username": "test1"}), data, format="json")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
