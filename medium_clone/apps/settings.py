@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'apps.profiles',
-    'apps.authentication'
+    'apps.authentication',
+    'apps.posts'
 ]
 
 REST_FRAMEWORK = {
