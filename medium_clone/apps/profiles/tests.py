@@ -49,7 +49,7 @@ class ProfileRetrieveUpdateTests(APITestCase):
 
     def test_modify_partial(self):
         """
-        User can modify a part of the profile.
+        Client can modify a part of the profile.
         """
         data = {"bio": "awesome", "username": "test1",
                 "email": "email@test.com"}
@@ -58,3 +58,16 @@ class ProfileRetrieveUpdateTests(APITestCase):
         res = self.client.patch(
             reverse("profile_retrieveupdate_view", kwargs={"username": "test1"}), data, format="json")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_put_not_allowed(self):
+        """
+        Client can't use put method.
+        """
+        data = {"bio": "awesome", "username": "test1",
+        "email": "email@test.com"}
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Token {self.user1_token}")
+        res = self.client.put(
+            reverse("profile_retrieveupdate_view", kwargs={"username": "test1"}), data, format="json")
+        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)       
+ 
