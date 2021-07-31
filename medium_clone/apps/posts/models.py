@@ -4,6 +4,8 @@ from apps.common.models import Timestamped
 
 
 class Post(Timestamped):
+    # The reason it uses Profile for FK instead of User is that Profile will display related posts.
+    # It is likely to be unconfortable if Post relates with User.
     author = models.ForeignKey(
         "profiles.Profile", on_delete=models.CASCADE, related_name='posts')
     # max_length=300 is heuristics.
