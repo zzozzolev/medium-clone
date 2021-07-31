@@ -1,8 +1,8 @@
 from django.urls import path
 
-from .views import ProfileRetrieveView
+from .views import ProfileRetrieveUpdateAPIView
 
 urlpatterns = [
     path("profiles/<str:username>/",
-         ProfileRetrieveView.as_view(), name="profile_retrieve_view")
+         ProfileRetrieveUpdateAPIView.as_view(), name="profile_retrieveupdate_view")
 ]
