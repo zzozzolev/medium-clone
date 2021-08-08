@@ -24,6 +24,12 @@ class PostSerializer(serializers.ModelSerializer):
             "description": {"required": False}
         }
 
+    def create(self, validated_data):
+        author = self.context["author"]
+        post = Post.objects.create(author=author, **validated_data)
+
+        return post
+
     def to_internal_value(self, data):
         self.set_slug_by_title(data)
         self.set_description_by_body(data)
