@@ -37,7 +37,6 @@ class PostSerializer(serializers.ModelSerializer):
 
         return data
 
-    # TODO: Make slug test cases.
     def set_slug_by_title(self, data):
         slug = slugify(data["title"])
         # default size is 12
