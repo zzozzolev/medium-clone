@@ -14,3 +14,6 @@ class Post(Timestamped):
     slug = models.SlugField(db_index=True, max_length=300, unique=True)
     body = models.TextField()
     description = models.TextField()
+
+    def __str__(self):
+        return self.title
