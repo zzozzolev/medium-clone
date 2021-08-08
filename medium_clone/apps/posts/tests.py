@@ -14,3 +14,10 @@ class PostSerializerTests(APITestCase):
         serializer.set_slug_by_title(data)
 
         self.assertEqual(len(data["slug"]), PostSerializer.SLUG_MAX_LENGTH)
+
+    def test_slug_gt_length(self):
+        data = {"title": "a" * PostSerializer.SLUG_MAX_LENGTH}
+        serializer = PostSerializer()
+        serializer.set_slug_by_title(data)
+
+        self.assertEqual(len(data["slug"]), PostSerializer.SLUG_MAX_LENGTH)
