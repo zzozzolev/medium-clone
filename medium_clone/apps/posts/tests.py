@@ -42,3 +42,14 @@ class PostSerializerTests(APITestCase):
         self.serializer.set_slug_by_title(data)
 
         self.assertNotRegex(data["slug"], "--")
+
+    def test_not_empty_description(self):
+        """
+        Test whether description is empty or not when description is not given.
+        """
+        data = {
+            "body": "test"
+        }
+        self.serializer.set_description_by_body(data)
+
+        self.assertTrue("description" in data)
