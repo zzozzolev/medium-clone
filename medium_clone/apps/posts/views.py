@@ -3,6 +3,7 @@ from rest_framework.response import Response
 
 from apps.common.permissions import IsOwnerOrReadOnly
 
+from .models import Post
 from .serializers import PostSerializer
 
 
@@ -13,11 +14,8 @@ class PostViewSet(viewsets.ViewSet):
     serializer_class = PostSerializer
 
     def create(self, request):
-        # TODO: Make test for this case.
-        if "post" not in request.data:
-            raise Response(request.data, status=status.HTTP_400_BAD_REQUEST)
-
-        serializer = self.serializer_class(request.data["post"])
+        serializer = self.serializer_class(data=request.data, context={
+                                           "author": request.user.profile})
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
