@@ -11,6 +11,7 @@ class PostSerializer(serializers.ModelSerializer):
     author = ProfileSerializer(read_only=True)
     SLUG_MAX_LENGTH = Post._meta.get_field("slug").max_length
     BODY_MAX_LENGTH = Post._meta.get_field("body").max_length
+    UNIQUE_SIZE = 12
 
     class Meta:
         model = Post
@@ -40,7 +41,7 @@ class PostSerializer(serializers.ModelSerializer):
     def set_slug_by_title(self, data):
         slug = slugify(data["title"])
         # default size is 12
-        unique = generate_random_string()
+        unique = generate_random_string(self.UNIQUE_SIZE)
 
         unique_hypen_length = len(unique) + 1
         if len(slug) + unique_hypen_length > self.SLUG_MAX_LENGTH:
