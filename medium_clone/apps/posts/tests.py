@@ -1,3 +1,6 @@
+from django.contrib.auth.models import User
+from django.urls import reverse
+from rest_framework import status
 from rest_framework.test import APITestCase
 
 from .models import Post
@@ -53,3 +56,42 @@ class PostSerializerTests(APITestCase):
         self.serializer.set_description_by_body(data)
 
         self.assertTrue("description" in data)
+
+
+class PostViewSetTests(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        client = cls.client_class()
+
+        data = {
+            "username": "test1",
+            "password": "test4321",
+            "password2": "test4321",
+            "email": "test@test.com",
+            "first_name": "test",
+            "last_name": "test"
+        }
+
+        client.post(reverse("register"), data, format="json")
+        client.post(reverse("get-auth-token"),
+                    {"username": "test1", "password": "test4321"})
+        user1_token = User.objects.get(username="test1").auth_token
+
+        data = {
+            "title": "test",
+            "body": "test"
+        }
+
+        client.credentials(HTTP_AUTHORIZATION=f"Token {user1_token}")
+        response = client.post(reverse("post-list"), data, format="json")
+        cls.user1_slug = response.data["slug"]
+
+    def test_retrieve_allowany(self):
+        """
+        Anyone can retireve other post even anonymous user.
+        """
+        # Unset credentials
+        self.client.credentials()
+        res = self.client.get(
+            reverse("post-detail", kwargs={"slug": self.user1_slug}))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
