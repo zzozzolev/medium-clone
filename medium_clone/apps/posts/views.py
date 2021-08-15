@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from apps.common.permissions import IsOwnerOrReadOnly
 
 from .models import Post
+from .pages import DefaultPagination
 from .serializers import PostSerializer
 
 
@@ -15,6 +16,7 @@ class PostViewSet(viewsets.ViewSet):
     # author is Profile model, so it requires User model for user info.
     queryset = Post.objects.select_related("author", "author__user")
     serializer_class = PostSerializer
+    pagination_class = DefaultPagination
 
     def get_queryset(self):
         queryset = self.queryset
@@ -41,4 +43,9 @@ class PostViewSet(viewsets.ViewSet):
 
         serializer = self.serializer_class(instance=instance)
 
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def list(self, request):
+        page = self.pagination_class().paginate_queryset(self.get_queryset(), request)
+        serializer = self.serializer_class(page, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
