@@ -1,5 +1,5 @@
 from rest_framework import status, viewsets
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 
 from apps.common.permissions import IsOwnerOrReadOnly
@@ -15,6 +15,15 @@ class PostViewSet(viewsets.ViewSet):
     # author is Profile model, so it requires User model for user info.
     queryset = Post.objects.select_related("author", "author__user")
     serializer_class = PostSerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+
+        author = self.request.query_params.get('author', None)
+        if author is None:
+            raise ValidationError(detail=f"`author` is not given.")
+        queryset.filter(author__user__username=author)
+        return queryset
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data, context={
