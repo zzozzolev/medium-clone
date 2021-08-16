@@ -104,3 +104,11 @@ class PostViewSetTests(APITestCase):
         self.client.credentials()
         res = self.client.get(reverse("post-list"), {"author": "test1"})
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_non_existent_author_404(self):
+        """
+        Raise 404 for a non-existent author.
+        """
+        self.client.credentials()
+        res = self.client.get(reverse("post-list"), {"author": "fsweru"})
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
