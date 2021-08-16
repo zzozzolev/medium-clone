@@ -112,3 +112,10 @@ class PostViewSetTests(APITestCase):
         self.client.credentials()
         res = self.client.get(reverse("post-list"), {"author": "fsweru"})
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_no_author_query_param(self):
+        """
+        Raise 400 if author query param is not given.
+        """
+        res = self.client.get(reverse("post-list"))
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
