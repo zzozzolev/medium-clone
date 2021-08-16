@@ -25,6 +25,10 @@ class PostViewSet(viewsets.ViewSet):
         if author is None:
             raise ValidationError(detail=f"`author` is not given.")
         queryset = queryset.filter(author__user__username=author)
+
+        if not queryset.exists():
+            raise NotFound(f"author `{author}` doesn't exist.")
+
         return queryset
 
     def create(self, request):
