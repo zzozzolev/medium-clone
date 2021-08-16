@@ -95,3 +95,12 @@ class PostViewSetTests(APITestCase):
         res = self.client.get(
             reverse("post-detail", kwargs={"slug": self.user1_slug}))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_list_allowany(self):
+        """
+        Anyone can list other post even anonymous user.
+        """
+        # Unset credentials
+        self.client.credentials()
+        res = self.client.get(reverse("post-list"), {"author": "test1"})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
