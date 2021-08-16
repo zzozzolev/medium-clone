@@ -46,6 +46,7 @@ class PostViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def list(self, request):
-        page = self.pagination_class().paginate_queryset(self.get_queryset(), request)
+        pagination = self.pagination_class()
+        page = pagination.paginate_queryset(self.get_queryset(), request)
         serializer = self.serializer_class(page, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return pagination.get_paginated_response(serializer.data)
