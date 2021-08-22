@@ -86,6 +86,14 @@ class PostViewSetTests(APITestCase):
         response = client.post(reverse("post-list"), data, format="json")
         cls.user1_slug = response.data["slug"]
 
+    def test_no_account_user_create_post(self):
+        """
+        User which doesn't have a account can't create a post.
+        """
+        self.client.credentials()
+        res = self.client.post(reverse("post-list"))
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_retrieve_allowany(self):
         """
         Anyone can retireve other post even anonymous user.
