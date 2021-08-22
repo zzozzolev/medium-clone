@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from apps.common.permissions import IsOwnerOrReadOnly
 
+from .exceptions import UserNoAccount
 from .models import Post
 from .pages import DefaultPagination
 from .serializers import PostSerializer
@@ -32,8 +33,16 @@ class PostViewSet(viewsets.ViewSet):
         return queryset
 
     def create(self, request):
+        # Anonymous user can't create a post.
+        try:
+            request.user.profile
+        # TODO: Add test case.
+        except AttributeError:
+            raise UserNoAccount()
+
         serializer = self.serializer_class(data=request.data, context={
-                                           "author": request.user.profile})
+            "author": request.user.profile})
+
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
