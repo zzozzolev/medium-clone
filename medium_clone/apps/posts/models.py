@@ -17,3 +17,7 @@ class Post(Timestamped):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        # latest post first
+        ordering = ("-created_at", )

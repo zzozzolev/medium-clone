@@ -95,3 +95,27 @@ class PostViewSetTests(APITestCase):
         res = self.client.get(
             reverse("post-detail", kwargs={"slug": self.user1_slug}))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_list_allowany(self):
+        """
+        Anyone can list other post even anonymous user.
+        """
+        # Unset credentials
+        self.client.credentials()
+        res = self.client.get(reverse("post-list"), {"author": "test1"})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_non_existent_author_404(self):
+        """
+        Raise 404 for a non-existent author.
+        """
+        self.client.credentials()
+        res = self.client.get(reverse("post-list"), {"author": "fsweru"})
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_no_author_query_param(self):
+        """
+        Raise 400 if author query param is not given.
+        """
+        res = self.client.get(reverse("post-list"))
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
