@@ -75,14 +75,14 @@ class PostViewSetTests(APITestCase):
         client.post(reverse("register"), data, format="json")
         client.post(reverse("get-auth-token"),
                     {"username": "test1", "password": "test4321"})
-        user1_token = User.objects.get(username="test1").auth_token
+        cls.user1_token = User.objects.get(username="test1").auth_token
 
         data = {
             "title": "test",
             "body": "test"
         }
 
-        client.credentials(HTTP_AUTHORIZATION=f"Token {user1_token}")
+        client.credentials(HTTP_AUTHORIZATION=f"Token {cls.user1_token}")
         response = client.post(reverse("post-list"), data, format="json")
         cls.user1_slug = response.data["slug"]
 
@@ -127,3 +127,17 @@ class PostViewSetTests(APITestCase):
         """
         res = self.client.get(reverse("post-list"))
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_partial_update_post(self):
+        """
+        Update the post.
+        """
+        # body is also required.
+        data = {
+            "title": "temp"
+        }
+
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.user1_token}")
+        res = self.client.patch(
+            reverse("post-detail", kwargs={"slug": self.user1_slug}), data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
