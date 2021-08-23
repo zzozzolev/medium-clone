@@ -75,16 +75,30 @@ class PostViewSetTests(APITestCase):
         client.post(reverse("register"), data, format="json")
         client.post(reverse("get-auth-token"),
                     {"username": "test1", "password": "test4321"})
-        user1_token = User.objects.get(username="test1").auth_token
+        cls.user1_token = User.objects.get(username="test1").auth_token
+
+        data["username"] = "test2"
+        data["email"] = "test2@test.com"
+        client.post(reverse("register"), data, format="json")
+        client.post(reverse("get-auth-token"),
+                    {"username": "test2", "password": "test4321"})
+        cls.user2_token = User.objects.get(username="test2").auth_token
+
+        client.credentials(HTTP_AUTHORIZATION=f"Token {cls.user1_token}")
 
         data = {
             "title": "test",
             "body": "test"
         }
-
-        client.credentials(HTTP_AUTHORIZATION=f"Token {user1_token}")
         response = client.post(reverse("post-list"), data, format="json")
-        cls.user1_slug = response.data["slug"]
+        cls.user1_slug1 = response.data["slug"]
+
+        data = {
+            "title": "test2",
+            "body": "test2"
+        }
+        response = client.post(reverse("post-list"), data, format="json")
+        cls.user1_slug2 = response.data["slug"]
 
     def test_no_account_user_create_post(self):
         """
@@ -101,7 +115,7 @@ class PostViewSetTests(APITestCase):
         # Unset credentials
         self.client.credentials()
         res = self.client.get(
-            reverse("post-detail", kwargs={"slug": self.user1_slug}))
+            reverse("post-detail", kwargs={"slug": self.user1_slug1}))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_list_allowany(self):
@@ -127,3 +141,30 @@ class PostViewSetTests(APITestCase):
         """
         res = self.client.get(reverse("post-list"))
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_partial_update_post(self):
+        """
+        Update the post.
+        """
+        # body is also required.
+        data = {
+            "title": "temp"
+        }
+
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.user1_token}")
+        res = self.client.patch(
+            reverse("post-detail", kwargs={"slug": self.user1_slug1}), data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_update_post_author_only(self):
+        """
+        Allow author only to update his/her post.
+        """
+        data = {
+            "title": "temp"
+        }
+
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.user2_token}")
+        res = self.client.patch(
+            reverse("post-detail", kwargs={"slug": self.user1_slug2}), data)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)

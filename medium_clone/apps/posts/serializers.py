@@ -9,6 +9,7 @@ from .models import Post
 
 class PostSerializer(serializers.ModelSerializer):
     author = ProfileSerializer(read_only=True)
+    is_update_key = "is_update"
     SLUG_MAX_LENGTH = Post._meta.get_field("slug").max_length
     BODY_MAX_LENGTH = Post._meta.get_field("body").max_length
     UNIQUE_SIZE = 12
@@ -35,8 +36,10 @@ class PostSerializer(serializers.ModelSerializer):
         return post
 
     def to_internal_value(self, data):
-        self.set_slug_by_title(data)
-        self.set_description_by_body(data)
+        # Set default values only by create method call.
+        if not self.context[self.is_update_key]:
+            self.set_slug_by_title(data)
+            self.set_description_by_body(data)
 
         return data
 

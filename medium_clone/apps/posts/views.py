@@ -18,6 +18,9 @@ class PostViewSet(viewsets.ViewSet):
     queryset = Post.objects.select_related("author", "author__user")
     serializer_class = PostSerializer
     pagination_class = DefaultPagination
+    # `to_internal_value` is called by `is_valid`
+    # create and update should be distinguished for setting default values.
+    update_context_key = "is_update"
 
     def get_queryset(self):
         queryset = self.queryset
@@ -41,7 +44,7 @@ class PostViewSet(viewsets.ViewSet):
             raise UserNoAccount()
 
         serializer = self.serializer_class(data=request.data, context={
-            "author": request.user.profile})
+            "author": request.user.profile, self.update_context_key: False})
 
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -63,3 +66,19 @@ class PostViewSet(viewsets.ViewSet):
         page = pagination.paginate_queryset(self.get_queryset(), request)
         serializer = self.serializer_class(page, many=True)
         return pagination.get_paginated_response(serializer.data)
+
+    def partial_update(self, request, slug):
+        try:
+            instance = self.queryset.get(slug=slug)
+        except Post.DoesNotExist:
+            raise NotFound(f"slug `{slug}` doesn't exist.")
+
+        # TODO: Test permission
+        self.check_object_permissions(request, instance.author)
+
+        serializer = self.serializer_class(
+            instance=instance, data=request.data, context={self.update_context_key: True})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
