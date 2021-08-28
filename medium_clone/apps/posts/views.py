@@ -82,3 +82,15 @@ class PostViewSet(viewsets.ViewSet):
         serializer.save()
 
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+    def destroy(self, request, slug):
+        try:
+            instance = self.queryset.get(slug=slug)
+        except Post.DoesNotExist:
+            raise NotFound(f"slug `{slug}` doesn't exist.")
+
+        self.check_object_permissions(request, instance.author)
+
+        instance.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
