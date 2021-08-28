@@ -73,7 +73,6 @@ class PostViewSet(viewsets.ViewSet):
         except Post.DoesNotExist:
             raise NotFound(f"slug `{slug}` doesn't exist.")
 
-        # TODO: Test permission
         self.check_object_permissions(request, instance.author)
 
         serializer = self.serializer_class(
