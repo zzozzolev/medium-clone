@@ -35,11 +35,18 @@ class PostViewSet(viewsets.ViewSet):
 
         return queryset
 
+    def get_instance(self, slug):
+        try:
+            instance = self.queryset.get(slug=slug)
+        except Post.DoesNotExist:
+            raise NotFound(f"slug `{slug}` doesn't exist.")
+
+        return instance
+
     def create(self, request):
         # Anonymous user can't create a post.
         try:
             request.user.profile
-        # TODO: Add test case.
         except AttributeError:
             raise UserNoAccount()
 
@@ -52,11 +59,7 @@ class PostViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, slug):
-        try:
-            instance = self.queryset.get(slug=slug)
-        except Post.DoesNotExist:
-            raise NotFound(f"slug `{slug}` doesn't exist.")
-
+        instance = self.get_instance(slug)
         serializer = self.serializer_class(instance=instance)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -68,11 +71,7 @@ class PostViewSet(viewsets.ViewSet):
         return pagination.get_paginated_response(serializer.data)
 
     def partial_update(self, request, slug):
-        try:
-            instance = self.queryset.get(slug=slug)
-        except Post.DoesNotExist:
-            raise NotFound(f"slug `{slug}` doesn't exist.")
-
+        instance = self.get_instance(slug)
         self.check_object_permissions(request, instance.author)
 
         serializer = self.serializer_class(
@@ -83,11 +82,7 @@ class PostViewSet(viewsets.ViewSet):
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
     def destroy(self, request, slug):
-        try:
-            instance = self.queryset.get(slug=slug)
-        except Post.DoesNotExist:
-            raise NotFound(f"slug `{slug}` doesn't exist.")
-
+        instance = self.get_instance(slug)
         self.check_object_permissions(request, instance.author)
 
         instance.delete()
