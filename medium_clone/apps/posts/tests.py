@@ -168,3 +168,13 @@ class PostViewSetTests(APITestCase):
         res = self.client.patch(
             reverse("post-detail", kwargs={"slug": self.user1_slug2}), data)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_destroy_post_author_only(self):
+        """
+        Allow author only to destroy his/her post.
+        """
+
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.user2_token}")
+        res = self.client.delete(
+            reverse("post-detail", kwargs={"slug": self.user1_slug2}))
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
