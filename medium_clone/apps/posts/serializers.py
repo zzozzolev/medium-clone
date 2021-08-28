@@ -17,7 +17,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ("author", "title", "slug", "body",
-                  "description", "created_at", "modified_at")
+                  "description", "created_at", "updated_at")
         extra_kwargs = {
             "title": {"required": True},
             # slug is made of title.
@@ -26,7 +26,7 @@ class PostSerializer(serializers.ModelSerializer):
             # description is given or made of body.
             "description": {"required": False},
             "created_at": {"read_only": True},
-            "modified_at": {"read_only": True}
+            "updated_at": {"read_only": True}
         }
 
     def create(self, validated_data):
