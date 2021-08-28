@@ -39,7 +39,6 @@ class PostViewSet(viewsets.ViewSet):
         # Anonymous user can't create a post.
         try:
             request.user.profile
-        # TODO: Add test case.
         except AttributeError:
             raise UserNoAccount()
 
