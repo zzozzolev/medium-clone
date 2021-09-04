@@ -1,0 +1,16 @@
+version: "2"
+services:
+  nginx:
+    image: nginx:medium_clone
+    build:
+      context: ..
+      dockerfile: docker/nginx.Dockerfile
+    ports:
+      - 80:80
+    depends_on:
+      - gunicorn
+  gunicorn:
+    image: django3:medium_clone
+    build:
+      context: ..
+      dockerfile: docker/django.Dockerfile
