@@ -12,4 +12,6 @@ COPY . /app/
 
 EXPOSE 8000
 
-ENTRYPOINT ["python3", "/app/medium_clone/manage.py", "runserver", "0.0.0.0:8000"]
+WORKDIR /app/medium_clone
+
+ENTRYPOINT ["gunicorn", "-c", "../conf/gunicorn.config.py"]
