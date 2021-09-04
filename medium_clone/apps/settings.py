@@ -25,7 +25,8 @@ SECRET_KEY = 'pyso820rtds9b774ibt81u7i3m55vzj1$sb*^d)%3izymcs6m$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# docker-compose gunicorn container name
+ALLOWED_HOSTS = ['gunicorn']
 
 
 # Application definition
