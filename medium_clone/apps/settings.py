@@ -26,7 +26,7 @@ SECRET_KEY = 'pyso820rtds9b774ibt81u7i3m55vzj1$sb*^d)%3izymcs6m$'
 DEBUG = True
 
 # docker-compose gunicorn container name
-ALLOWED_HOSTS = ['gunicorn']
+ALLOWED_HOSTS = ['gunicorn', 'localhost']
 
 
 # Application definition
