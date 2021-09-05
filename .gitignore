@@ -1,3 +1,6 @@
+# django static files. `STATIC_ROOT`
+static/
+
 # vscode
 .vscode
 
