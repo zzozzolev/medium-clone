@@ -17,10 +17,6 @@ class AuthTests(APITestCase):
         }
         client.post(reverse("register"), cls.data, format="json")
 
-    def setUp(self):
-        # Make Email different for every method.
-        self.data["Email"] = f"{self._testMethodName}@test.com"
-
     def test_not_same_email(self):
         """
         Users never have same email.
