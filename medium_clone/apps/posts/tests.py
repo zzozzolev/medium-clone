@@ -73,18 +73,15 @@ class PostViewSetTests(APITestCase):
         }
 
         client.post(reverse("register"), data, format="json")
-        client.post(reverse("get-auth-token"),
-                    {"username": "test1", "password": "test4321"})
-        cls.user1_token = User.objects.get(username="test1").auth_token
 
         data["username"] = "test2"
         data["email"] = "test2@test.com"
         client.post(reverse("register"), data, format="json")
-        client.post(reverse("get-auth-token"),
-                    {"username": "test2", "password": "test4321"})
-        cls.user2_token = User.objects.get(username="test2").auth_token
 
-        client.credentials(HTTP_AUTHORIZATION=f"Token {cls.user1_token}")
+        cls.user1 = User.objects.get(username="test1")
+        cls.user2 = User.objects.get(username="test2")
+
+        client.force_authenticate(user=cls.user1)
 
         data = {
             "title": "test",
@@ -104,7 +101,7 @@ class PostViewSetTests(APITestCase):
         """
         User which doesn't have a account can't create a post.
         """
-        self.client.credentials()
+        self.client.force_authenticate(user=None)
         res = self.client.post(reverse("post-list"))
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -113,7 +110,7 @@ class PostViewSetTests(APITestCase):
         Anyone can retireve other post even anonymous user.
         """
         # Unset credentials
-        self.client.credentials()
+        self.client.force_authenticate(user=None)
         res = self.client.get(
             reverse("post-detail", kwargs={"slug": self.user1_slug1}))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -123,7 +120,7 @@ class PostViewSetTests(APITestCase):
         Anyone can list other post even anonymous user.
         """
         # Unset credentials
-        self.client.credentials()
+        self.client.force_authenticate(user=None)
         res = self.client.get(reverse("post-list"), {"author": "test1"})
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
@@ -131,7 +128,7 @@ class PostViewSetTests(APITestCase):
         """
         Raise 404 for a non-existent author.
         """
-        self.client.credentials()
+        self.client.force_authenticate(user=None)
         res = self.client.get(reverse("post-list"), {"author": "fsweru"})
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -150,8 +147,7 @@ class PostViewSetTests(APITestCase):
         data = {
             "title": "temp"
         }
-
-        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.user1_token}")
+        self.client.force_authenticate(user=self.user1)
         res = self.client.patch(
             reverse("post-detail", kwargs={"slug": self.user1_slug1}), data)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -163,8 +159,7 @@ class PostViewSetTests(APITestCase):
         data = {
             "title": "temp"
         }
-
-        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.user2_token}")
+        self.client.force_authenticate(user=self.user2)
         res = self.client.patch(
             reverse("post-detail", kwargs={"slug": self.user1_slug2}), data)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
@@ -173,8 +168,7 @@ class PostViewSetTests(APITestCase):
         """
         Allow author only to destroy his/her post.
         """
-
-        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.user2_token}")
+        self.client.force_authenticate(user=self.user2)
         res = self.client.delete(
             reverse("post-detail", kwargs={"slug": self.user1_slug2}))
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
