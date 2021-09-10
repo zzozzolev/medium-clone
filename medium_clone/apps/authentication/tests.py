@@ -25,7 +25,7 @@ class AuthTests(APITestCase):
         """
         Users never have same email.
         """
-        _ = self.client.post(reverse("register"), self.data, format="json")
+        self.data["username"] = self._testMethodName
         res = self.client.post(reverse("register"), self.data, format="json")
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
