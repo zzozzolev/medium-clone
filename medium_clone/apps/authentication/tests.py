@@ -36,3 +36,13 @@ class AuthTests(APITestCase):
         """
         res = self.client.post(self.url, self.data, format="json")
         # TODO: user 정보 얻어오는 api가 개발되면 password 가져와서 비교하기
+
+    def test_jwt(self):
+        """
+        Test whether jwt works well or not.
+        """
+        res = self.client.post(reverse("token_obtain_pair"), data={
+            "username": self.data["username"], "password": self.data["password"]}, format="json")
+        res = self.client.post(reverse("token_refresh"), data={
+                               "refresh": res.json()["refresh"]}, format="json")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
