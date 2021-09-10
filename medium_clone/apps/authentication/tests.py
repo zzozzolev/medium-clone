@@ -3,17 +3,20 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 
-class RegistrationTests(APITestCase):
+class AuthTests(APITestCase):
     @classmethod
     def setUpTestData(cls):
+        client = cls.client_class()
         cls.data = {
             "username": "test",
-            "password": "test1234",
-            "password2": "test1234",
+            "password": "test4321",
+            "password2": "test4321",
+            "email": "test@test.com",
             "first_name": "test",
             "last_name": "test"
         }
         cls.url = reverse("register")
+        client.post(reverse("register"), cls.data, format="json")
 
     def setUp(self):
         # Make Email different for every method.
