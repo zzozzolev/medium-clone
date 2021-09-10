@@ -15,7 +15,6 @@ class AuthTests(APITestCase):
             "first_name": "test",
             "last_name": "test"
         }
-        cls.url = reverse("register")
         client.post(reverse("register"), cls.data, format="json")
 
     def setUp(self):
@@ -26,15 +25,15 @@ class AuthTests(APITestCase):
         """
         Users never have same email.
         """
-        _ = self.client.post(self.url, self.data, format="json")
-        res = self.client.post(self.url, self.data, format="json")
+        _ = self.client.post(reverse("register"), self.data, format="json")
+        res = self.client.post(reverse("register"), self.data, format="json")
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_password_hashed(self):
         """
         User's password must be hashed.
         """
-        res = self.client.post(self.url, self.data, format="json")
+        res = self.client.post(reverse("register"), self.data, format="json")
         # TODO: user 정보 얻어오는 api가 개발되면 password 가져와서 비교하기
 
     def test_jwt(self):
