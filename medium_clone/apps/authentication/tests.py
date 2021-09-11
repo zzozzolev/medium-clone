@@ -41,3 +41,15 @@ class AuthTests(APITestCase):
         res = self.client.post(reverse("token_refresh"), data={
                                "refresh": res.json()["refresh"]}, format="json")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_jwt_blacklist(self):
+        """
+        Test whether blacklisting refresh token works well or not.
+        """
+        res = self.client.post(reverse("token_obtain_pair"), data={
+            "username": self.data["username"], "password": self.data["password"]}, format="json")
+        self.client.post(reverse("token_blacklist"), data={
+                         "refresh": res.json()["refresh"]}, format="json")
+        res = self.client.post(reverse("token_refresh"), data={
+                               "refresh": res.json()["refresh"]}, format="json")
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
