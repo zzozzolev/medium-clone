@@ -20,8 +20,7 @@ class Profile(Timestamped):
         self.liked_posts.remove(post)
 
     def has_liked(self, post):
-        # TODO: filter를 이렇게 거는 게 맞나?
-        self.liked_posts.filter(post=post.id).exists()
+        return self.liked_posts.filter(pk=post.pk).exists()
 
 
 class Meta:
