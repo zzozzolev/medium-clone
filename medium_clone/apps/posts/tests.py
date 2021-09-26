@@ -58,7 +58,7 @@ class PostSerializerTests(APITestCase):
         self.assertTrue("description" in data)
 
 
-class PostViewSetTests(APITestCase):
+class PostAPITests(APITestCase):
     @classmethod
     def setUpTestData(cls):
         client = cls.client_class()
