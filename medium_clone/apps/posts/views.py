@@ -1,6 +1,8 @@
 from rest_framework import status, viewsets
 from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from apps.common.permissions import IsOwnerOrReadOnly
 
@@ -88,3 +90,36 @@ class PostViewSet(viewsets.ViewSet):
         instance.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class PostLikeAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = PostSerializer
+
+    def get_instance(self, slug):
+        # TODO: add non-existent post like test.
+        try:
+            instance = Post.objects.get(slug=slug)
+        except Post.DoesNotExist:
+            raise NotFound
+
+        return instance
+
+    def post(self, request, slug):
+        # TODO: add anonymous user like test.
+        try:
+            profile = request.user.profile
+        except AttributeError:
+            # Anonymous user can't like a post.
+            # Frontend must handle the redirection to register.
+            raise UserNoAccount()
+
+        # TODO: 유저는 자기 자신의 포스트를 좋아요할 수 없음.
+
+        instance = self.get_instance(slug)
+        # TODO: add 했을 때 바로 적용? -> 테스트 해보기
+        profile.liked_posts.add(instance)
+        serializer = self.serializer_class(
+            instance=instance, context={"user": request.user})
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
