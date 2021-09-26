@@ -117,7 +117,7 @@ class PostLikeAPIView(APIView):
         # TODO: 유저는 자기 자신의 포스트를 좋아요할 수 없음.
 
         instance = self.get_instance(slug)
-        # TODO: add 했을 때 바로 적용? -> 테스트 해보기
+        # add 했을 때 liked_posts의 테이블에 바로 추가돼서 확인 가능함.
         profile.liked_posts.add(instance)
         serializer = self.serializer_class(
             instance=instance, context={"user": request.user})
