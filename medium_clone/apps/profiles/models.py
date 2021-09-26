@@ -13,5 +13,16 @@ class Profile(Timestamped):
     def __str__(self):
         return self.user.username
 
-    class Meta:
-        ordering = ("user__username", )
+    def like(self, post):
+        self.liked_posts.add(post)
+
+    def unlike(self, post):
+        self.liked_posts.remove(post)
+
+    def has_liked(self, post):
+        # TODO: filter를 이렇게 거는 게 맞나?
+        self.liked_posts.filter(post=post.id).exists()
+
+
+class Meta:
+    ordering = ("user__username", )
