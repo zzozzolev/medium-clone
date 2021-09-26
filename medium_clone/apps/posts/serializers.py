@@ -9,6 +9,8 @@ from .models import Post
 
 class PostSerializer(serializers.ModelSerializer):
     author = ProfileSerializer(read_only=True)
+    liked = serializers.SerializerMethodField()
+    # TODO: liked_num
     is_update_key = "is_update"
     SLUG_MAX_LENGTH = Post._meta.get_field("slug").max_length
     BODY_MAX_LENGTH = Post._meta.get_field("body").max_length
@@ -17,7 +19,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ("author", "title", "slug", "body",
-                  "description", "created_at", "updated_at")
+                  "description", "created_at", "updated_at", "liked")
         extra_kwargs = {
             "title": {"required": True},
             # slug is made of title.
@@ -42,6 +44,18 @@ class PostSerializer(serializers.ModelSerializer):
             self.set_description_by_body(data)
 
         return data
+
+    def get_liked(self, instance):
+        user = self.context.get("user", None)
+
+        if user is None:
+            return False
+
+        # Handle Anonymous user like display.
+        if not user.is_authenticated:
+            return False
+
+        return user.profile.has_liked(instance)
 
     def set_slug_by_title(self, data):
         slug = slugify(data["title"])
