@@ -172,3 +172,14 @@ class PostAPITests(APITestCase):
         res = self.client.delete(
             reverse("post-detail", kwargs={"slug": self.user1_slug2}))
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_user_like_post(self):
+        """
+        User can like other users' posts.
+        """
+        self.client.force_authenticate(user=self.user2)
+        res = self.client.post(
+            reverse("post_like_view", kwargs={"slug": self.user1_slug2})
+        )
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(res.json()["liked"])
