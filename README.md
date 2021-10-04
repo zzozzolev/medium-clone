@@ -44,3 +44,7 @@
 - Django: 3.1.13
 - djangorestframework: 3.12.0
 - djangorestframework-simplejwt: 4.8.0
+
+## Implementation Points
+
+- [Here](https://github.com/zzozzolev/medium-clone/issues/3)
