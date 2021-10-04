@@ -33,3 +33,7 @@
 | ---------------------- | ------- | ------------------------------------------ |
 | `profiles/<username>/` | `GET`   | username에 해당하는 프로필을 보여준다.     |
 | `profiles/<username>/` | `PATCH` | username에 해당하는 프로필을 업데이트한다. |
+
+## DB
+
+![DB](./docs/DB.png)
